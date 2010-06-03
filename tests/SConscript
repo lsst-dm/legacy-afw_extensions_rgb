@@ -1,0 +1,18 @@
+# -*- python -*-
+Import("env")
+import os, re, sys
+
+import lsst.tests
+import eups
+#
+# Tests
+#
+tests = lsst.tests.Control(env, verbose=True)
+
+dataDir = eups.productDir("afwdata")
+if not dataDir:
+    print "Warning: afwdata is not set up; not running the tests!"
+else:
+    # set up python tests
+    for target in tests.run("*.py"):
+        pass

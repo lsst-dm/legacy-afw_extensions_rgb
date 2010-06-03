@@ -1,0 +1,8 @@
+# -*- python -*-
+#
+# Note: the shared libraries are built in ../lib
+#
+Import("env")
+
+env.Program("imageIo.cc", LIBS=env.getlibs(env["eups_product"]))
+env.Program("imageRgb.cc", LIBS=env.getlibs(env["eups_product"]))

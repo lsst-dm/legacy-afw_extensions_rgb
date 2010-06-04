@@ -19,7 +19,7 @@ env = scons.makeEnv(product,
 #
 # Build/install things
 #
-for d in Split("doc examples lib python/lsst/afw/extension/rgb src tests"):
+for d in Split("doc examples lib python/lsst/afwExtension/rgb src tests"):
     SConscript(os.path.join(d, "SConscript"))
 
 env['IgnoreFiles'] = r"(~$|\.pyc$|^\.svn$|\.o$)"

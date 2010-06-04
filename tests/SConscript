@@ -15,4 +15,6 @@ if not dataDir:
 else:
     # set up python tests
     for target in tests.run("*.py"):
-        pass
+        for pkgName in ("rgb", ):
+            env.Depends(target, os.path.join(
+                "#python", "lsst", "afwExtension", pkgName, "_%sLib%s" % (pkgName, env["LDMODULESUFFIX"])))

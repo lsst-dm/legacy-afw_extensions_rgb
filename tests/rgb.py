@@ -13,12 +13,10 @@ import math, os, sys
 import unittest
 
 import lsst.utils.tests as utilsTests
-#import lsst.pex.exceptions
-#import lsst.daf.base
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
 import lsst.afw.display.ds9 as ds9
-import lsst.afw.extension.rgb as afwRgb
+import lsst.afwExtension.rgb as afwRgb
 try:
     type(display)
 except NameError:
@@ -86,7 +84,8 @@ class RgbTestCase(unittest.TestCase):
         tiffFile = "rgb.tiff"
         rgb.writeTiff(tiffFile)
         if False:
-            os.system("open %s" % tiffFile)
+            if os.system("open %s > /dev/null 2>&1" % tiffFile) != 0:
+                print "Not removing %s" % (tiffFile)
         else:
             os.remove(tiffFile)
 

@@ -8,8 +8,8 @@ import lsst.SConsUtils as scons
 try:
     scons.ConfigureDependentProducts
 except AttributeError:
-    import lsst.afw.SconsUtils
-    scons.ConfigureDependentProducts = lsst.afw.SconsUtils.ConfigureDependentProducts
+    import lsst.afw.scons.SconsUtils
+    scons.ConfigureDependentProducts = lsst.afw.scons.SconsUtils.ConfigureDependentProducts
 
 product = "afw_extensions_rgb"
 env = scons.makeEnv(product,
@@ -19,7 +19,7 @@ env = scons.makeEnv(product,
 #
 # Build/install things
 #
-for d in Split("doc examples lib python/lsst/afwExtension/rgb src tests"):
+for d in Split("doc examples lib python/lsst/afw/extensions/rgb src tests"):
     SConscript(os.path.join(d, "SConscript"))
 
 env['IgnoreFiles'] = r"(~$|\.pyc$|^\.svn$|\.o$)"

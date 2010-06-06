@@ -16,7 +16,7 @@ import lsst.utils.tests as utilsTests
 import lsst.afw.image as afwImage
 import lsst.afw.math as afwMath
 import lsst.afw.display.ds9 as ds9
-import lsst.afwExtension.rgb as afwRgb
+import lsst.afw.extensions.rgb as afwRgb
 try:
     type(display)
 except NameError:

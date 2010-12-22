@@ -2,10 +2,10 @@
 #define LSST_AFW_EXTENSION_RGB_RGB_H 1
 
 #include <string>
-#include <stdexcept>
 #include "boost/shared_ptr.hpp"
 #include "boost/gil/gil_all.hpp"
 #include "boost/gil/extension/io/tiff_io.hpp"
+#include "lsst/pex/exceptions.h"
 
 namespace lsst { namespace afw { namespace extension { namespace rgb {
 
@@ -44,28 +44,28 @@ public:
         if(valR > valG) {
             if(valR > valB) {
                 if(valR >= channelMax) {
+                    valG *= channelMax/valR;
+                    valB *= channelMax/valR;
                     valR = channelMax;
-                    valG = channelMax*g/r;
-                    valB = channelMax*b/r;
                 }
             } else {
                 if(valB >= channelMax) {
-                    valR = channelMax*r/b;
-                    valG = channelMax*g/b;
+                    valR *= channelMax/valB;
+                    valG *= channelMax/valB;
                     valB = channelMax;
                 }
             }
         } else {
             if(valG > valB) {
                 if(valG >= channelMax) {
-                    valR = channelMax*r/g;
+                    valR *= channelMax/valG;
+                    valB *= channelMax/valG;
                     valG = channelMax;
-                    valB = channelMax*b/g;
                 }
             } else {
                 if(valB >= channelMax) {
-                    valR = channelMax*r/b;
-                    valG = channelMax*g/b;
+                    valR *= channelMax/valB;
+                    valG *= channelMax/valB;
                     valB = channelMax;
                 }
             }
@@ -104,7 +104,11 @@ lsst::afw::extension::rgb::RgbImage<ImageT>::RgbImage(ImageT const& rim,
     _view(view(*_image))
 {
     if (rim.getDimensions() != gim.getDimensions() || rim.getDimensions() != bim.getDimensions()) {
-        throw std::exception();
+        throw LSST_EXCEPT(lsst::pex::exceptions::LengthErrorException,
+                           (boost::format("Each of the RGB must be the same size: %dx%d %dx%d %dx%d")
+                            % rim.getWidth() % rim.getHeight()
+                            % gim.getWidth() % gim.getHeight()
+                            % bim.getWidth() % bim.getHeight()).str());
     }
 
     for (int y = 0; y != rim.getHeight(); ++y) {

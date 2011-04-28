@@ -1,13 +1,14 @@
 #include "lsst/afw/image/Image.h"
 #include "boost/gil/extension/io/tiff_io.hpp"
 
+namespace afwGeom = lsst::afw::geom;
 namespace afwImage = lsst::afw::image;
 
 int main() {
     typedef float Pixel;
     const int ncol = 100;
     const int nrow = 256;
-    afwImage::Image<Pixel> im(ncol, nrow);
+    afwImage::Image<Pixel> im(afwGeom::ExtentI(ncol, nrow));
 
     for (int y = 0; y != nrow; ++y) {
         for (afwImage::Image<Pixel>::x_iterator ptr = im.row_begin(y); ptr != im.row_end(y); ++ptr) {

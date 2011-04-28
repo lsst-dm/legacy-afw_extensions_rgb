@@ -14,6 +14,7 @@ import unittest
 
 import lsst.utils.tests as utilsTests
 import lsst.afw.image as afwImage
+import lsst.afw.geom as afwGeom
 import lsst.afw.math as afwMath
 import lsst.afw.display.ds9 as ds9
 import lsst.afw.extensions.rgb as afwRgb
@@ -31,9 +32,9 @@ class RgbTestCase(unittest.TestCase):
     def setUp(self):
         width, height = 85, 75
         self.images = []
-        self.images.append(afwImage.ImageF(width, height))
-        self.images.append(afwImage.ImageF(width, height))
-        self.images.append(afwImage.ImageF(width, height))
+        self.images.append(afwImage.ImageF(afwGeom.ExtentI(width, height)))
+        self.images.append(afwImage.ImageF(afwGeom.ExtentI(width, height)))
+        self.images.append(afwImage.ImageF(afwGeom.ExtentI(width, height)))
 
         for (x, y, A, g_r, r_i) in [(15, 15, 1000,  1.0,  2.0),
                                     (50, 45, 5500, -1.0, -0.5),

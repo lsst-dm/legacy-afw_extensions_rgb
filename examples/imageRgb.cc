@@ -2,6 +2,7 @@
 #include "lsst/afw/image/Image.h"
 #include "boost/gil/extension/io/tiff_io.hpp"
 
+namespace afwGeom = lsst::afw::geom;
 namespace afwImage = lsst::afw::image;
 
 template<typename Pixel>
@@ -36,9 +37,9 @@ int main() {
     typedef float Pixel;
     const int ncol = 50;
     const int nrow = 50;
-    afwImage::Image<Pixel> R(ncol, nrow);
-    afwImage::Image<Pixel> G(ncol, nrow);
-    afwImage::Image<Pixel> B(ncol, nrow);
+    afwImage::Image<Pixel> R(afwGeom::ExtentI(ncol, nrow));
+    afwImage::Image<Pixel> G(afwGeom::ExtentI(ncol, nrow));
+    afwImage::Image<Pixel> B(afwGeom::ExtentI(ncol, nrow));
 
     R = 0; G = 0; B = 0;
     

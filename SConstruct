@@ -17,7 +17,7 @@ env = scons.makeEnv(product,
                     scons.ConfigureDependentProducts(product)
                     )
 
-env.libs[env["eups_product"]] +=  env.getlibs("daf_base daf_data daf_persistence pex_logging pex_exceptions pex_policy security afw boost tifflib")
+env.libs[env["eups_product"]] +=  env.getlibs("daf_base daf_data daf_persistence pex_logging pex_exceptions pex_policy security afw ndarray boost tifflib")
 #
 # Build/install things
 #

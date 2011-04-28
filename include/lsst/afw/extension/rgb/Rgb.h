@@ -147,10 +147,28 @@ public:
     AsinhMapping(double min,            // minimum value of intensity
                  double range,          // range of intensities to use if Q == 0
                  double Q=0.0           // softening parameter for asinh stretch
-                );
+                ) {
+        _init(min, min, min, range, Q);
+    }
+    AsinhMapping(double minR,           // minimum value of intensity in R
+                 double minG,           // minimum value of intensity in G
+                 double minB,           // minimum value of intensity in B
+                 double range,          // range of intensities to use if Q == 0
+                 double Q=0.0           // softening parameter for asinh stretch
+                ) {
+        _init(minR, minG, minB, range, Q);
+    }
+
     virtual rgb_traits::pixel operator()(PixelT r, PixelT g, PixelT b) const;
 private:
-    double _min, _soften, _slope;
+   void _init(double minR,           // minimum value of intensity in R
+              double minG,           // minimum value of intensity in G
+              double minB,           // minimum value of intensity in B
+              double range,          // range of intensities to use if Q == 0
+              double Q=0.0           // softening parameter for asinh stretch
+             );
+
+    double _min[3], _soften, _slope;
 };
                 
 }}}}

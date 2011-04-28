@@ -5,12 +5,21 @@
 #include "lsst/afw/image/Image.h"
 #include "lsst/afw/extension/rgb/Rgb.h"
 
-namespace afwImage = lsst::afw::image;
 namespace afwRgb = lsst::afw::extension::rgb;
 
 template<typename PixelT, typename Intensity>
-afwRgb::AsinhMapping<PixelT, Intensity>::AsinhMapping(double min, double range, double Q) : _min(min)
+void afwRgb::AsinhMapping<PixelT, Intensity>::_init(
+        double minR,                    // minimum value of intensity in R
+        double minG,                    // minimum value of intensity in G
+        double minB,                    // minimum value of intensity in B
+        double range,                   // range of intensities to use if Q == 0
+        double Q                        // softening parameter for asinh stretch
+                                                     )
 {
+    _min[0] = minR;
+    _min[1] = minG;
+    _min[2] = minB;
+
     double const alpha = 1/range;
 
     if (fabs(Q) < std::numeric_limits<float>::epsilon()) {
@@ -38,7 +47,11 @@ template<typename PixelT, typename Intensity>
 afwRgb::rgb_traits::pixel
 afwRgb::AsinhMapping<PixelT, Intensity>::operator()(PixelT r, PixelT g, PixelT b) const
 {
-    double const I = Intensity()(r, g, b) - _min;
+    r -= _min[0];
+    g -= _min[1];
+    b -= _min[2];
+
+    double const I = Intensity()(r, g, b);
     if (I <= 0.0) {
         return afwRgb::rgb_traits::pixel(0, 0, 0);
     }
@@ -49,5 +62,5 @@ afwRgb::AsinhMapping<PixelT, Intensity>::operator()(PixelT r, PixelT g, PixelT b
     return this->trueColorPixel(valR, valG, valB);
 }
 
-template class afwRgb::RgbImage<afwImage::Image<float> >;
+template class afwRgb::RgbImage<lsst::afw::image::Image<float> >;
 template class afwRgb::AsinhMapping<float>;

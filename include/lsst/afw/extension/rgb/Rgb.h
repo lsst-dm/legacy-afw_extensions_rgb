@@ -5,6 +5,7 @@
 #include "boost/shared_ptr.hpp"
 #include "boost/gil/gil_all.hpp"
 #include "boost/gil/extension/io/tiff_io.hpp"
+#include "boost/gil/extension/io/png_io.hpp"
 #include "lsst/pex/exceptions.h"
 
 namespace lsst { namespace afw { namespace extension { namespace rgb {
@@ -86,7 +87,11 @@ public:
     RgbImage(ImageT const& rim, ImageT const& gim, ImageT const& bim,
              RgbMapping<typename ImageT::Pixel> const& rgbMap);
 
-    void writeTiff(std::string const& fileName) {
+    void write(std::string const& fileName) const;
+    void writePng(std::string const& fileName) const {
+        boost::gil::png_write_view(fileName, _view);
+    }
+    void writeTiff(std::string const& fileName) const {
         boost::gil::tiff_write_view(fileName, _view);
     }
 private:

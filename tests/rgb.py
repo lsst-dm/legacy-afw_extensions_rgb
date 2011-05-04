@@ -13,6 +13,7 @@ import math, os, sys
 import unittest
 
 import lsst.utils.tests as utilsTests
+import lsst.pex.exceptions as pexExceptions
 import lsst.afw.image as afwImage
 import lsst.afw.geom as afwGeom
 import lsst.afw.math as afwMath
@@ -82,13 +83,18 @@ class RgbTestCase(unittest.TestCase):
             ds9.mtv(self.images[G], frame=1, title="G")
             ds9.mtv(self.images[R], frame=2, title="R")
 
-        tiffFile = "rgb.tiff"
-        rgb.writeTiff(tiffFile)
-        if False:
-            if os.system("open %s > /dev/null 2>&1" % tiffFile) != 0:
-                print "Not removing %s" % (tiffFile)
-        else:
-            os.remove(tiffFile)
+        for ext in ("png", "tiff"):
+            fileName = "rgb.%s" % ext
+            rgb.write(fileName)
+            if False:
+                if os.system("open %s > /dev/null 2>&1" % fileName) != 0:
+                    print "Not removing %s" % (fileName)
+            else:
+                os.remove(fileName)
+
+        def tst():
+            rgb.write("rgb.unknown")
+        utilsTests.assertRaisesLsstCpp(self, pexExceptions.NotFoundException, tst)
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

@@ -2,10 +2,30 @@
  * \file
  */
 #include <cmath>
+#include "boost/regex.hpp"
+#include "boost/format.hpp"
 #include "lsst/afw/image/Image.h"
 #include "lsst/afw/extension/rgb/Rgb.h"
 
 namespace afwRgb = lsst::afw::extension::rgb;
+
+template<typename ImageT>
+void afwRgb::RgbImage<ImageT>::write(std::string const& fileName) const
+{
+    static const boost::regex pngRE("\\.png$");
+    static const boost::regex tiffRE("\\.tiff$");
+
+    if (boost::regex_search(fileName.c_str(), pngRE)) {
+        writePng(fileName);
+    } else if (boost::regex_search(fileName.c_str(), tiffRE)) {
+        writeTiff(fileName);
+    } else {
+        throw LSST_EXCEPT(lsst::pex::exceptions::NotFoundException,
+                          (boost::format("Unrecognised file type: %s") % fileName).str());
+    }
+}
+
+/************************************************************************************************************/
 
 template<typename PixelT, typename Intensity>
 void afwRgb::AsinhMapping<PixelT, Intensity>::_init(

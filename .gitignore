@@ -1,0 +1,30 @@
+
+# /
+/.sconsign.dblite
+/config.log
+/.sconf_temp
+
+# /doc/
+/doc/htmlDir
+/doc/doxygen.conf
+
+# /examples/
+/examples/imageIo
+/examples/imageRgb
+
+# /python/lsst/afw/
+/python/lsst/afw/*.pyc
+
+# /python/lsst/afw/extensions/
+/python/lsst/afw/extensions/*.pyc
+
+# /python/lsst/afw/extensions/rgb/
+/python/lsst/afw/extensions/rgb/rgbLib.py
+/python/lsst/afw/extensions/rgb/*_wrap.*
+/python/lsst/afw/extensions/rgb/*.pyc
+
+# /src/
+/src/*.os
+
+# /tests/
+/tests/.tests

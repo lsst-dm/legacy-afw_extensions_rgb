@@ -1,13 +1,3 @@
 # -*- python -*-
-#
-#
-import os
-import eups
-
-Import("env")
-
-env.Command('doxygen.conf',
-            [os.path.join(eups.productDir("afw"), "doc", "doxygen.conf"), 'doxygen.conf.in'],
-            "cat $SOURCES > $TARGET")
-
-doxy = env.Doxygen("htmlDir", "doxygen.conf")
+from lsst.sconsUtils import scripts
+scripts.BasicSConscript.doc()

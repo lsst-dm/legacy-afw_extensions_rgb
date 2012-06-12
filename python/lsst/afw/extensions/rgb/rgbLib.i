@@ -9,8 +9,10 @@ Python bindings for classes describing the the geometry of a mosaic camera
 %module(package="lsst.afw.extension.rgb", docstring=rgbLib_DOCSTRING) rgbLib
 
 %{
+#include "lsst/pex/logging.h"
 #include "lsst/afw/geom.h"
 #include "lsst/afw/image.h"
+#include "lsst/afw/cameraGeom.h"
 #include "lsst/afw/extension/rgb/Rgb.h"
 %}
 

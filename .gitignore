@@ -7,8 +7,9 @@
 .sconsign.dblite
 config.log
 .sconf_temp
-doc/htmlDir
+doc/html
 doc/doxygen.conf
+doc/*.tag
 examples/imageIo
 examples/imageRgb
 python/lsst/afw/*.pyc

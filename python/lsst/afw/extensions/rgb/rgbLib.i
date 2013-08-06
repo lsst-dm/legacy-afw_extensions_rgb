@@ -26,3 +26,5 @@ Python bindings for classes describing the the geometry of a mosaic camera
 %template(rgbMappingF) lsst::afw::extension::rgb::RgbMapping<float>;
 %template(asinhMappingF) lsst::afw::extension::rgb::AsinhMapping<float>;
 %template(RgbImageF) lsst::afw::extension::rgb::RgbImage<lsst::afw::image::Image<float> >;
+%template(replaceSaturatedPixels)
+        lsst::afw::extension::rgb::replaceSaturatedPixels<lsst::afw::image::MaskedImage<float> >;

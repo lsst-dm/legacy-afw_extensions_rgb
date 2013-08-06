@@ -176,6 +176,15 @@ private:
     double _min[3], _soften, _slope;
 };
                 
+template<typename ImageT>
+void
+replaceSaturatedPixels(ImageT & rim,    //< R image (e.g. i)
+                       ImageT & gim,    //< G image (e.g. r)
+                       ImageT & bim,    //< B image (e.g. g)
+                       int borderWidth = 2, //< width of border used to estimate colour of saturated regions
+                       float saturatedPixelValue = 65535 //< the brightness of a saturated pixel, once fixed
+                      );
+
 }}}}
 
 #endif

@@ -10,10 +10,12 @@ or
 """
 
 import math, os, sys
+import numpy as np
 import unittest
 
 import lsst.utils.tests as utilsTests
 import lsst.pex.exceptions as pexExceptions
+import lsst.afw.detection as afwDetect
 import lsst.afw.image as afwImage
 import lsst.afw.geom as afwGeom
 import lsst.afw.math as afwMath
@@ -70,7 +72,7 @@ class RgbTestCase(unittest.TestCase):
             del im
         del self.images
 
-    def testStars(self):
+    def writeFile(self, fileName):
         if True:
             min, range, Q = 0, 5, 20  # asinh
         else:
@@ -83,9 +85,14 @@ class RgbTestCase(unittest.TestCase):
             ds9.mtv(self.images[G], frame=1, title="G")
             ds9.mtv(self.images[R], frame=2, title="R")
 
+        rgb.write(fileName)
+
+
+    def testStars(self):
         for ext in ("png", "tiff"):
             fileName = "rgb.%s" % ext
-            rgb.write(fileName)
+            self.writeFile(fileName)
+
             if False:
                 if os.system("open %s > /dev/null 2>&1" % fileName) != 0:
                     print "Not removing %s" % (fileName)
@@ -93,9 +100,52 @@ class RgbTestCase(unittest.TestCase):
                 os.remove(fileName)
 
         def tst():
-            rgb.write("rgb.unknown")
+            self.writeFile("rgb.unknown")
         utilsTests.assertRaisesLsstCpp(self, pexExceptions.NotFoundException, tst)
 
+    def testSaturated(self):
+        """Test interpolating saturated pixels"""
+
+        feet = {}
+        for f in [R, G, B]:
+            self.images[f] = afwImage.makeMaskedImage(self.images[f])
+
+            ds = afwDetect.FootprintSet(self.images[f], afwDetect.Threshold(1000), "SAT")
+            feet[f] = ds.getFootprints()
+
+            arr = self.images[f].getImage().getArray()
+            arr[np.where(arr >= 1000)] = np.nan
+
+        afwRgb.replaceSaturatedPixels(self.images[R], self.images[G], self.images[B], 1, 2000)
+        #
+        # Check that we replaced those NaNs with some reasonable value
+        #
+        f0 = [k for k, v in feet.items() if v][0] # find a filter with a saturated region
+        foot = feet[f0][0]
+        s = foot.getSpans()[0]
+        for f in [R, G, B]:
+            val = self.images[f].getImage().get(s.getX0(), s.getY())
+            self.assertTrue(np.isfinite(val))
+        
+        if False:
+            ds9.mtv(self.images[B], frame=0, title="B")
+            ds9.mtv(self.images[G], frame=1, title="G")
+            ds9.mtv(self.images[R], frame=2, title="R")
+        #
+        # Prepare for generating an output file
+        #
+        for f in [R, G, B]:
+            self.images[f] = self.images[f].getImage()
+
+        fileName = "sat.png"
+        self.writeFile(fileName)
+
+        if False:
+            if os.system("open %s > /dev/null 2>&1" % fileName) != 0:
+                print "Not removing %s" % (fileName)
+        else:
+            os.remove(fileName)
+        
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 def suite():

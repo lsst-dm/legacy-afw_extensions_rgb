@@ -41,6 +41,26 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
                        float saturatedPixelValue // the brightness of a saturated pixel, once fixed
                       )
 {
+    int const width = rim.getWidth(), height = rim.getHeight();
+    int const x0 = rim.getX0(), y0 = rim.getY0();
+
+    if (width != gim.getWidth() || height != gim.getHeight() || x0 != gim.getX0() || y0 != gim.getY0()) {
+        throw LSST_EXCEPT(lsst::pex::exceptions::InvalidParameterException,
+                          str(boost::format("R image has different size/origin from G image "
+                                            "(%dx%d+%d+%d v. %dx%d+%d+%d")
+                              % width % height % x0 % y0
+                              % gim.getWidth() % gim.getHeight() % gim.getX0() % gim.getY0()));
+
+    }
+    if (width != bim.getWidth() || height != bim.getHeight() || x0 != bim.getX0() || y0 != bim.getY0()) {
+        throw LSST_EXCEPT(lsst::pex::exceptions::InvalidParameterException,
+                          str(boost::format("R image has different size/origin from B image "
+                                            "(%dx%d+%d+%d v. %dx%d+%d+%d")
+                              % width % height % x0 % y0
+                              % bim.getWidth() % bim.getHeight() % bim.getX0() % bim.getY0()));
+
+    }
+
     SetPixels<typename ImageT::Image>
         setR(*rim.getImage()),
         setG(*gim.getImage()),
@@ -67,9 +87,18 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
                  send = bigFoot->getSpans().end(); sptr != send; ++sptr) {
             PTR(detection::Span) const span = *sptr;
 
-            int const y = span->getY();
-            int const sx0 = span->getX0();
-            int const sx1 = span->getX1();
+            int const y = span->getY() - y0;
+            if (y < 0 || y >= height) {
+                continue;
+            }
+            int sx0 = span->getX0() - x0;
+            if (sx0 < 0) {
+                sx0 = 0;
+            }
+            int sx1 = span->getX1() - x0;
+            if (sx1 >= width) {
+                sx1 = width - 1;
+            }
 
             for (typename ImageT::iterator
                      rptr = rim.at(sx0, y),

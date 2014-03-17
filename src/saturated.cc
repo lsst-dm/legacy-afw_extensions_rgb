@@ -4,6 +4,7 @@
  * Handle saturated pixels when making colour images
  */
 #include "boost/format.hpp"
+#include "lsst/utils/ieee.h"
 #include "lsst/afw/detection.h"
 #include "lsst/afw/image/MaskedImage.h"
 #include "lsst/afw/extension/rgb/Rgb.h"
@@ -61,6 +62,8 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
 
     }
 
+    bool const useMaxPixel = !lsst::utils::isfinite(saturatedPixelValue);
+
     SetPixels<typename ImageT::Image>
         setR(*rim.getImage()),
         setG(*gim.getImage()),
@@ -81,7 +84,8 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
         PTR(detection::Footprint) foot = *ptr;
         PTR(detection::Footprint) bigFoot = growFootprint(*foot, borderWidth);
 
-        float sumR = 0, sumG = 0, sumB = 0;
+        float sumR = 0, sumG = 0, sumB = 0; // sum of all non-saturated adjoining pixels
+        float maxR = 0, maxG = 0, maxB = 0; // maximum of non-saturated adjoining pixels
 
         for (detection::Footprint::SpanList::const_iterator sptr = bigFoot->getSpans().begin(),
                  send = bigFoot->getSpans().end(); sptr != send; ++sptr) {
@@ -106,9 +110,23 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
                      gptr = gim.at(sx0, y),
                      bptr = bim.at(sx0, y); rptr != rend; ++rptr, ++gptr, ++bptr) {
                 if (!((rptr.mask() | gptr.mask() | bptr.mask()) & SAT)) {
-                    sumR += rptr.image();
-                    sumG += gptr.image();
-                    sumB += bptr.image();
+                    float val = rptr.image();
+                    sumR += val;
+                    if (val > maxR) {
+                        maxR = val;
+                    }
+                    
+                    val = gptr.image();
+                    sumG += val;
+                    if (val > maxG) {
+                        maxG = val;
+                    }
+
+                    val = bptr.image();
+                    sumB += val;
+                    if (val > maxB) {
+                        maxB = val;
+                    }
                 }
             }
         }
@@ -116,25 +134,27 @@ replaceSaturatedPixels(ImageT & rim,    // R image (e.g. i)
         // so we can figure out the proper values to use for the saturated ones
         float R = 0, G = 0, B = 0;      // mean intensities
         if(sumR + sumB + sumG > 0) {
+            float scale = 1.0;          // how much to scale up max values
             if(sumR > sumG) {
                 if(sumR > sumB) {
-                    R = saturatedPixelValue;
-                    G = (saturatedPixelValue*sumG)/sumR;
-                    B = (saturatedPixelValue*sumB)/sumR;
+                    R = scale*(useMaxPixel ? maxR : saturatedPixelValue);
+                    
+                    G = (R*sumG)/sumR;
+                    B = (R*sumB)/sumR;
                 } else {
-                    R = (saturatedPixelValue*sumR)/sumB;
-                    G = (saturatedPixelValue*sumG)/sumB;
-                    B = saturatedPixelValue;
+                    B = scale*(useMaxPixel ? maxB : saturatedPixelValue);
+                    R = (B*sumR)/sumB;
+                    G = (B*sumG)/sumB;
                 }
             } else {
                 if(sumG > sumB) {
-                    R = (saturatedPixelValue*sumR)/sumG;
-                    G = saturatedPixelValue;
-                    B = (saturatedPixelValue*sumB)/sumG;
+                    G = scale*(useMaxPixel ? maxG : saturatedPixelValue);
+                    R = (G*sumR)/sumG;
+                    B = (G*sumB)/sumG;
                 } else {
-                    R = (saturatedPixelValue*sumR)/sumB;
-                    G = (saturatedPixelValue*sumG)/sumB;
-                    B = saturatedPixelValue;
+                    B = scale*(useMaxPixel ? maxB : saturatedPixelValue);
+                    R = (B*sumR)/sumB;
+                    G = (B*sumG)/sumB;
                 }
             }
         }

@@ -4,6 +4,13 @@
 #include <string>
 #include "boost/shared_ptr.hpp"
 #include "boost/gil/gil_all.hpp"
+
+#include "png.h"
+#if !defined(png_infopp_NULL)           // boost uses obselete internal libpng types
+#   define png_infopp_NULL (png_infopp)NULL
+#   define int_p_NULL (int*)NULL
+#endif
+
 #include "boost/gil/extension/io/tiff_io.hpp"
 #include "boost/gil/extension/io/png_io.hpp"
 #include "lsst/pex/exceptions.h"
